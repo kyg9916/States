@@ -4,65 +4,67 @@
 <meta charset="UTF-8">
 <title>캬루 상태 버튼</title>
 <style>
-  button {
-    font-size: 18px;
-    margin: 6px;
-    padding: 10px 16px;
-    cursor: pointer;
-  }
+body { font-family: sans-serif; text-align: center; padding: 20px; }
+input, button { padding: 10px; margin: 5px; font-size: 16px; }
+button:disabled { background-color: #ccc; cursor: not-allowed; }
 </style>
 </head>
 <body>
 
-<h2>📢 상태 알림</h2>
+<h2>캬루 상태 버튼</h2>
 
-<button onclick="sendStatus('eat')">🍚 밥</button>
-<button onclick="sendStatus('toilet')">🚽 화장실</button>
-<button onclick="sendStatus('shop')">🛒 쇼핑</button>
-<button onclick="sendStatus('coffee')">☕ 커피</button>
-<button onclick="sendStatus('back')">✅ 복귀</button>
+<label>닉네임 입력: </label>
+<input type="text" id="nickname" placeholder="닉네임 입력">
+<br>
+
+<button onclick="send('eat')" id="btn-eat" disabled>🍚 밥</button>
+<button onclick="send('toilet')" id="btn-toilet" disabled>🚽 화장실</button>
+<button onclick="send('shop')" id="btn-shop" disabled>🛒 쇼핑</button>
+<button onclick="send('coffee')" id="btn-coffee" disabled>☕ 커피</button>
+<button onclick="send('back')" id="btn-back" disabled>✅ 복귀</button>
 
 <script>
-const WEBHOOK_URL = "https://discord.com/api/webhooks/1458597916955381800/FjIDySDIfP-kZp1udUCL7o6pQN0pv7yJyz0KLiYcLrEm6FyrK10Z5Z9XJnNN0JpRGpxf";
+const buttons = document.querySelectorAll("button");
+const nicknameInput = document.getElementById("nickname");
 
-let NAME = localStorage.getItem("user_name");
-if (!NAME) {
-  NAME = prompt("디스코드 닉네임을 입력하세요");
-  localStorage.setItem("user_name", NAME);
+// 닉네임 입력 없으면 버튼 비활성화
+nicknameInput.addEventListener("input", () => {
+    const valid = nicknameInput.value.trim() !== "";
+    buttons.forEach(btn => btn.disabled = !valid);
+});
+
+function send(action) {
+    const nickname = nicknameInput.value.trim();
+    if (!nickname) {
+        alert("닉네임을 입력해주세요!");
+        return;
+    }
+
+    const now = new Date();
+    const timestamp = now.toISOString().slice(0,16).replace("T", " "); // YYYY-MM-DD HH:MM
+
+    // Discord Webhook 호출
+    fetch("YOUR_DISCORD_WEBHOOK_URL", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            content: `[${timestamp}] ${nickname}가 ${actionMessage(action)}`
+        })
+    }).then(() => {
+        console.log("메시지 전송 완료");
+    }).catch(err => console.error(err));
 }
 
-
-function nowTime() {
-  const d = new Date();
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
-  const hh = String(d.getHours()).padStart(2, '0');
-  const min = String(d.getMinutes()).padStart(2, '0');
-  return `${yyyy}-${mm}-${dd} / ${hh}:${min}`;
-}
-
-function messageByAction(action) {
-  const t = nowTime();
-  const map = {
-    eat: `[${t}] ${NAME}가 밥을 먹으러 갔어요!`,
-    toilet: `[${t}] ${NAME}가 화장실에 갔어요!`,
-    shop: `[${t}] ${NAME}가 잠깐 물건을 사러 갔어요!`,
-    coffee: `[${t}] ${NAME}가 커피 마시러 갔어요!`,
-    back: `[${t}] ${NAME}가 돌아왔어요!`
-  };
-  return map[action];
-}
-
-function sendStatus(action) {
-  const content = messageByAction(action);
-  if (!content) return;
-
-  fetch(WEBHOOK_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ content })
-  });
+// 행동 메시지 매핑
+function actionMessage(action) {
+    const map = {
+        eat: "밥을 먹으러 갔어요!",
+        toilet: "화장실에 갔어요!",
+        shop: "잠깐 물건을 사러 밖에 나갔어요!",
+        back: "돌아왔어요!",
+        coffee: "커피 마시러 갔어요!"
+    };
+    return map[action] || "무슨 행동인지 알 수 없어요!";
 }
 </script>
 
