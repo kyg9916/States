@@ -4,67 +4,74 @@
 <meta charset="UTF-8">
 <title>상태알라미 상태 버튼</title>
 <style>
-body { font-family: sans-serif; text-align: center; padding: 20px; }
-input, button { padding: 10px; margin: 5px; font-size: 16px; }
-button:disabled { background-color: #ccc; cursor: not-allowed; }
+    body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+    input { padding: 8px; font-size: 16px; width: 200px; }
+    button { padding: 10px 20px; margin: 5px; font-size: 16px; cursor: pointer; }
+    h2 { margin-bottom: 20px; }
 </style>
 </head>
 <body>
 
-<h2>상태알라미 상태 버튼</h2>
+<h2>닉네임을 입력해주세요</h2>
+<input type="text" id="nickname" placeholder="닉네임">
+<br><br>
 
-<label>닉네임 입력: </label>
-<input type="text" id="nickname" placeholder="닉네임 입력">
-<br>
+<!-- 기존 버튼들 -->
+<button onclick="send('eat')">🍚 밥</button>
+<button onclick="send('toilet')">🚽 화장실</button>
+<button onclick="send('shop')">🛒 쇼핑</button>
+<button onclick="send('coffee')">☕ 커피</button>
+<button onclick="send('back')">✅ 복귀</button>
 
-<button onclick="send('eat')" id="btn-eat" disabled>🍚 밥</button>
-<button onclick="send('toilet')" id="btn-toilet" disabled>🚽 화장실</button>
-<button onclick="send('shop')" id="btn-shop" disabled>🛒 쇼핑</button>
-<button onclick="send('coffee')" id="btn-coffee" disabled>☕ 커피</button>
-<button onclick="send('back')" id="btn-back" disabled>✅ 복귀</button>
+<!-- 새 버튼들 -->
+<button onclick="send('cigarette')">🚬 담배</button>
+<button onclick="send('outing')">🏃 외출</button>
+<button onclick="send('nap')">😴 잠</button>
 
 <script>
-const buttons = document.querySelectorAll("button");
-const nicknameInput = document.getElementById("nickname");
-
-// 닉네임 입력 없으면 버튼 비활성화
-nicknameInput.addEventListener("input", () => {
-    const valid = nicknameInput.value.trim() !== "";
-    buttons.forEach(btn => btn.disabled = !valid);
-});
-
 function send(action) {
-    const nickname = nicknameInput.value.trim();
+    const nickname = document.getElementById('nickname').value.trim();
     if (!nickname) {
-        alert("닉네임을 입력해주세요!");
+        alert("닉네임을 입력해야 버튼을 사용할 수 있어요!");
         return;
     }
 
-    const now = new Date();
-    const timestamp = now.toISOString().slice(0,16).replace("T", " "); // YYYY-MM-DD HH:MM
+    // 메시지 설정
+    const messages = {
+        "eat": `${nickname}가 밥을 먹으러 갔어요!`,
+        "toilet": `${nickname}가 화장실에 갔어요!`,
+        "shop": `${nickname}가 잠깐 물건을 사러 밖에 나갔어요!`,
+        "back": `${nickname}가 돌아왔어요!`,
+        "coffee": `${nickname}가 커피 마시러 갔어요!`,
+        "cigarette": `${nickname}가 담배를 피러 갔어요!`,
+        "outing": `${nickname}가 잠시 외출했어요!`,
+        "nap": `${nickname}가 잠시 휴식하러 떠났어요!`
+    };
 
-    // Discord Webhook 호출
+    const msg = messages[action];
+    if (!msg) return;
+
+    // 현재 시간 가져오기 (24시간 형식)
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const timestamp = `${year}-${month}-${day} / ${hours}:${minutes}`;
+
+    // Webhook 전송
     fetch("YOUR_DISCORD_WEBHOOK_URL", {
         method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({
-            content: `[${timestamp}] ${nickname}가 ${actionMessage(action)}`
-        })
-    }).then(() => {
-        console.log("메시지 전송 완료");
-    }).catch(err => console.error(err));
-}
-
-// 행동 메시지 매핑
-function actionMessage(action) {
-    const map = {
-        eat: "밥을 먹으러 갔어요!",
-        toilet: "화장실에 갔어요!",
-        shop: "잠깐 물건을 사러 밖에 나갔어요!",
-        back: "돌아왔어요!",
-        coffee: "커피 마시러 갔어요!"
-    };
-    return map[action] || "무슨 행동인지 알 수 없어요!";
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: `[${timestamp}] ${msg}` })
+    })
+    .then(() => {
+        console.log(`[${timestamp}] ${msg} 전송 완료`);
+    })
+    .catch(err => {
+        console.error("웹훅 전송 오류:", err);
+    });
 }
 </script>
 
