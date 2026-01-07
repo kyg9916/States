@@ -61,7 +61,7 @@ function send(action) {
     const timestamp = `${year}-${month}-${day} / ${hours}:${minutes}`;
 
     // Webhook 전송
-    fetch("YOUR_DISCORD_WEBHOOK_URL", {
+    fetch("https://discord.com/api/webhooks/1458597916955381800/FjIDySDIfP-kZp1udUCL7o6pQN0pv7yJyz0KLiYcLrEm6FyrK10Z5Z9XJnNN0JpRGpxf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content: `[${timestamp}] ${msg}` })
