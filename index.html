@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>캬루 상태 버튼</title>
+<style>
+  button {
+    font-size: 18px;
+    margin: 6px;
+    padding: 10px 16px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<h2>📢 상태 알림</h2>
+
+<button onclick="sendStatus('eat')">🍚 밥</button>
+<button onclick="sendStatus('toilet')">🚽 화장실</button>
+<button onclick="sendStatus('shop')">🛒 쇼핑</button>
+<button onclick="sendStatus('coffee')">☕ 커피</button>
+<button onclick="sendStatus('back')">✅ 복귀</button>
+
+<script>
+const WEBHOOK_URL = "https://discord.com/api/webhooks/1458597916955381800/FjIDySDIfP-kZp1udUCL7o6pQN0pv7yJyz0KLiYcLrEm6FyrK10Z5Z9XJnNN0JpRGpxf";
+
+let NAME = localStorage.getItem("user_name");
+if (!NAME) {
+  NAME = prompt("디스코드 닉네임을 입력하세요");
+  localStorage.setItem("user_name", NAME);
+}
+
+
+function nowTime() {
+  const d = new Date();
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  const hh = String(d.getHours()).padStart(2, '0');
+  const min = String(d.getMinutes()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd} / ${hh}:${min}`;
+}
+
+function messageByAction(action) {
+  const t = nowTime();
+  const map = {
+    eat: `[${t}] ${NAME}가 밥을 먹으러 갔어요!`,
+    toilet: `[${t}] ${NAME}가 화장실에 갔어요!`,
+    shop: `[${t}] ${NAME}가 잠깐 물건을 사러 갔어요!`,
+    coffee: `[${t}] ${NAME}가 커피 마시러 갔어요!`,
+    back: `[${t}] ${NAME}가 돌아왔어요!`
+  };
+  return map[action];
+}
+
+function sendStatus(action) {
+  const content = messageByAction(action);
+  if (!content) return;
+
+  fetch(WEBHOOK_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ content })
+  });
+}
+</script>
+
+</body>
+</html>
