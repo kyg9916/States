@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>상태알라미 v6.5 (Embed)</title>
+<title>상태알라미 v6.7</title>
 <style>
     :root {
         --bg-color: #f0f2f5;
@@ -70,7 +70,7 @@
 <button class="theme-btn" onclick="toggleTheme()">🌓</button>
 
 <div class="header-area">
-    <h1>📡 디스코드 상태알라미 v6.5</h1>
+    <h1>📡 디스코드 상태알라미 v6.7</h1>
     <div class="developer">Developer by. 김윤겸</div>
 </div>
 
@@ -208,12 +208,23 @@ function getActionMessage(action, customText = "") {
     return messages[action] || "활동 중이에요!";
 }
 
+let isProcessingBack = false; // 복귀 처리가 진행 중인지 확인하는 변수
+
 // 🚀 상태 전송 메인 함수 (Embed 적용)
 function send(action, statusName) {
     const nickname = document.getElementById('nickname').value.trim();
     const returnTimeValue = document.getElementById('return-time').value.trim();
     const returnTime = returnTimeValue ? parseInt(returnTimeValue) : null;
     if (!nickname) { alert("닉네임을 입력해주세요!"); return; }
+
+    // [추가] 복귀 중복 방지 로직
+    if (action === 'back') {
+        if (isProcessingBack) return; // 이미 복귀 처리 중이면 함수 종료
+        isProcessingBack = true;
+
+        // 3초 뒤에 다시 복귀 버튼을 누를 수 있게 초기화 (도배 방지)
+        setTimeout(() => { isProcessingBack = false; }, 3000);
+    }
 
     clearInterval(countdownInterval);
     document.getElementById('countdown-display').style.display = "none";
@@ -258,7 +269,11 @@ function send(action, statusName) {
         }]
     };
 
-    fetch(DISCORD_WEBHOOK, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(embedData) });
+    fetch(DISCORD_WEBHOOK, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(embedData)
+    });
 
     updateUI(nickname, info.icon, statusName, timestamp, statusMsg);
 
@@ -273,6 +288,7 @@ function send(action, statusName) {
     } else {
         localStorage.removeItem('currentStatus');
         document.getElementById('return-time').value = "";
+        document.getElementById('countdown-display').innerText = "";
     }
 }
 
@@ -294,11 +310,14 @@ function addHistoryItem(nickname, msg, timestamp) {
 
 function startTimer(secondsTotal) {
     let secondsLeft = Math.floor(secondsTotal);
+    if (countdownInterval) clearInterval(countdownInterval);
+
     countdownInterval = setInterval(() => {
         secondsLeft--;
         if (secondsLeft <= 0) {
             clearInterval(countdownInterval);
             if (Notification.permission === 'granted') new Notification("복귀 알림", { body: "복귀 시간이 되었습니다!" });
+
             send('back', '자동 복귀');
             return;
         }
@@ -331,7 +350,7 @@ function restoreStatus() {
     const statusData = JSON.parse(data);
     const now = Date.now();
 
-    // 만약 이미 시간이 만료되었다면 현재 시간부터 다시 계산, 아니면 기존 만료시간에 추가
+    // 1. 새로운 만료 시간 계산
     let baseTime = (statusData.expireTime && statusData.expireTime > now)
                    ? statusData.expireTime
                    : now;
@@ -339,24 +358,31 @@ function restoreStatus() {
     const newExpireTime = baseTime + (min * 60000);
     const remainingSeconds = Math.floor((newExpireTime - now) / 1000);
 
-    // 1. 데이터 업데이트
+    // --- 💡 [추가] 새로운 복귀 예정 시각 계산 ---
+    const targetDate = new Date(newExpireTime);
+    const targetHour = String(targetDate.getHours()).padStart(2, '0');
+    const targetMin = String(targetDate.getMinutes()).padStart(2, '0');
+    const estimatedTimeStr = `${targetHour}:${targetMin} 예정`;
+    // ------------------------------------------
+
+    // 2. 데이터 업데이트 및 타이머 재시작
     statusData.expireTime = newExpireTime;
     localStorage.setItem('currentStatus', JSON.stringify(statusData));
 
-    // 2. 타이머 재시작
     clearInterval(countdownInterval);
     document.getElementById('countdown-display').style.display = "block";
     startTimer(remainingSeconds);
 
-    // 3. 디스코드에 연장 알림 전송 (Embed)
+    // 3. 디스코드에 연장 알림 전송 (복귀 예정 시각 포함)
     const timestamp = getNowFormatted();
     const embedData = {
         embeds: [{
             title: `⏳ 시간 연장 알림`,
             color: 3447003, // 파란색
-            description: `${statusData.nickname}님의 복귀 시간이 ${min}분 연장**되었습니다.`,
+            description: `${statusData.nickname}님의 복귀 시간이 ${min}분 연장되었습니다.`,
             fields: [
-                { name: "남은 시간", value: `${Math.floor(remainingSeconds / 60)}분`, inline: true }
+                { name: "남은 시간", value: `${Math.floor(remainingSeconds / 60)}분`, inline: true },
+                { name: "복귀 예정 시각", value: estimatedTimeStr, inline: true } // 👈 새로 추가된 필드
             ],
             footer: { text: `연장 시각: ${timestamp}` }
         }]
@@ -365,7 +391,7 @@ function restoreStatus() {
     fetch(DISCORD_WEBHOOK, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(embedData) });
 
     // 4. 기록 추가
-    addHistoryItem(statusData.nickname, `⏳ 시간을 ${min}분 연장함`, timestamp);
+    addHistoryItem(statusData.nickname, `⏳ 시간을 ${min}분 연장함 (예정: ${targetHour}:${targetMin})`, timestamp);
 }
 </script>
 </body>
