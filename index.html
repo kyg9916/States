@@ -2,78 +2,380 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>상태알라미 상태 버튼</title>
+<title>상태알라미 v6.3</title>
 <style>
-    body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-    input { padding: 8px; font-size: 16px; width: 200px; }
-    button { padding: 10px 20px; margin: 5px; font-size: 16px; cursor: pointer; }
-    h2 { margin-bottom: 20px; }
+    :root {
+        --bg-color: #f0f2f5;
+        --text-color: #333333;
+        --accent-color: #5865F2;
+        --custom-color: #2ecc71;
+        --card-bg: #ffffff;
+        --border-radius: 16px;
+    }
+
+    body.dark-mode {
+        --bg-color: #1e1f22;
+        --text-color: #dbdee1;
+        --card-bg: #2b2d31;
+    }
+
+    body {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        font-family: 'Pretendard', 'Malgun Gothic', sans-serif;
+        margin: 0;
+        padding: 20px;
+        transition: 0.3s;
+    }
+
+    /* 메인 타이틀 영역 */
+    .header-area {
+        text-align: center;
+        margin-top: 40px;
+        margin-bottom: -10px;
+    }
+    .header-area h1 {
+        font-size: 2.2rem;
+        color: var(--accent-color);
+        margin-bottom: 5px;
+        letter-spacing: -1px;
+    }
+    .header-area .developer {
+        font-size: 0.9rem;
+        color: #888;
+        font-weight: 500;
+    }
+
+    h2 { margin-top: 0; font-size: 1.4rem; color: var(--accent-color); margin-bottom: 20px; }
+
+    .main-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        max-width: 1400px;
+        margin: 40px auto;
+        justify-content: center;
+        align-items: stretch;
+    }
+
+    .grid-column {
+        flex: 1 1 350px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card {
+        background: var(--card-bg);
+        border-radius: var(--border-radius);
+        padding: 25px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        height: 100%;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+    }
+
+    input {
+        width: 100%;
+        padding: 12px;
+        margin: 10px 0;
+        border-radius: 10px;
+        border: 1px solid #ddd;
+        box-sizing: border-box;
+        outline: none;
+        font-size: 14px;
+    }
+    .timer-input { width: 100px; display: inline-block; background-color: #fffbe6; margin-right: 5px; }
+
+    button {
+        padding: 10px 12px;
+        margin: 3px;
+        font-size: 13px;
+        cursor: pointer;
+        border-radius: 8px;
+        border: none;
+        background-color: #f1f3f5;
+        transition: 0.2s;
+    }
+    button:hover { background-color: #e9ecef; transform: translateY(-2px); }
+    .btn-primary { background-color: var(--accent-color); color: white; }
+    .btn-success { background-color: var(--custom-color); color: white; }
+    .btn-back { background-color: #d1d8ff !important; font-weight: bold; width: 100%; margin: 15px 0 0 0; font-size: 15px; padding: 15px; }
+
+    .time-chip { background-color: #ffeaa7; border: 1px solid #fdcb6e; font-weight: 600; }
+    .time-chip:hover { background-color: #fab1a0; }
+
+    #status-display {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding-top: 20px;
+    }
+    .status-icon { font-size: 5.5rem; margin-bottom: 25px; }
+    #display-text { font-size: 1.5rem; font-weight: bold; line-height: 1.6; text-align: center; }
+    #countdown-display { font-size: 1.5rem; color: #e74c3c; margin-top: 25px; font-weight: 800; background: #fff5f5; padding: 10px 20px; border-radius: 30px; }
+
+    #status-history {
+        max-height: 250px;
+        overflow-y: auto;
+        text-align: left;
+        background: #f9f9f9;
+        padding: 10px;
+        border-radius: 8px;
+        margin-top: 10px;
+        flex-grow: 1;
+    }
+    .dark-mode #status-history { background: #35373c; }
+    .history-item { padding: 8px; border-bottom: 1px solid #eee; font-size: 0.85rem; }
+
+    .warning-box {
+        background-color: #fff5f5;
+        border-left: 4px solid #ff8787;
+        padding: 12px;
+        margin-top: 15px;
+        font-size: 0.8rem;
+        text-align: left;
+        color: #e03131;
+    }
+    .dark-mode .warning-box { background-color: #3b2525; color: #ffc9c9; }
+
+    .theme-btn { position: fixed; top: 20px; right: 20px; background-color: var(--accent-color); color: white; width: 45px; height: 45px; border-radius: 50%; z-index: 1000; }
+
+    @media (max-width: 1100px) {
+        .main-grid { flex-direction: column; }
+        .grid-column { min-height: auto; }
+        .header-area { margin-top: 60px; }
+    }
 </style>
 </head>
 <body>
 
-<h2>닉네임을 입력해주세요</h2>
-<input type="text" id="nickname" placeholder="닉네임">
-<br><br>
+<button class="theme-btn" onclick="toggleTheme()">🌓</button>
 
-<!-- 기존 버튼들 -->
-<button onclick="send('eat')">🍚 밥</button>
-<button onclick="send('toilet')">🚽 화장실</button>
-<button onclick="send('shop')">🛒 쇼핑</button>
-<button onclick="send('coffee')">☕ 커피</button>
-<button onclick="send('back')">✅ 복귀</button>
+<div class="header-area">
+    <h1>📡 디스코드 상태알라미 v6.3</h1>
+    <div class="developer">Developer by. 김윤겸</div>
+</div>
 
-<!-- 새 버튼들 -->
-<button onclick="send('cigarette')">🚬 담배</button>
-<button onclick="send('outing')">🏃 외출</button>
-<button onclick="send('nap')">😴 잠</button>
+<div class="main-grid">
+
+    <div class="grid-column">
+        <div class="card">
+            <h2>👤 내 설정</h2>
+            <input type="text" id="nickname" placeholder="닉네임을 입력하세요" oninput="saveNickname()">
+
+            <div style="margin-top: 20px;">
+                <strong>⏱ 복귀 시간 선택 (분)</strong><br>
+                <div style="margin: 10px 0;">
+                    <button class="time-chip" onclick="setTimeValue(3)">3분</button>
+                    <button class="time-chip" onclick="setTimeValue(5)">5분</button>
+                    <button class="time-chip" onclick="setTimeValue(10)">10분</button>
+                    <button class="time-chip" onclick="setTimeValue(30)">20분</button>
+                    <button class="time-chip" onclick="setTimeValue(30)">30분</button>
+                    <button class="time-chip" onclick="setTimeValue(60)">60분</button>
+                </div>
+
+                <div style="display: flex; align-items: center; margin-top: 10px;">
+                    <input type="number" id="return-time" class="timer-input" placeholder="직접 입력">
+                    <span>분 후 복귀</span>
+                </div>
+
+                <div class="warning-box">
+                    <strong>⚠️ 이용 가이드</strong><br>
+                    - 시간을 정하고 아래 상태 버튼을 누르세요.<br>
+                    - 미설정 시 무제한 상태로 유지됩니다.<br>
+                    - 브라우저 알림 권한 허용을 권장합니다.
+                </div>
+            </div>
+
+            <hr style="margin: 25px 0; border: 0; border-top: 1px solid #eee;">
+
+            <h2>📍 빠른 상태 선택</h2>
+            <div class="btn-group">
+                <button onclick="send('eat', '밥')">🍚 밥</button>
+                <button onclick="send('toilet', '화장실')">🚽 화장실</button>
+                <button onclick="send('coffee', '커피')">☕ 커피</button>
+                <button onclick="send('shop', '쇼핑')">🛒 쇼핑</button>
+                <button onclick="send('outing', '외출')">🏃 외출</button>
+                <button onclick="send('cigarette', '담배')">🚬 담배</button>
+                <button onclick="send('nap', '잠')">😴 잠</button>
+                <button onclick="send('back', '복귀')" class="btn-back">✅ 지금 자리로 복귀하기</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid-column">
+        <div class="card">
+            <h2>✨ 커스텀 & 기록</h2>
+            <div style="margin-bottom: 20px;">
+                <label style="font-size: 0.9rem; font-weight: bold;">나만의 상태 입력</label>
+                <input type="text" id="custom-status" placeholder="회의, 산책 등 직접 작성 (Enter)" onkeypress="if(event.keyCode==13) sendCustomStatus()">
+                <button class="btn-success" style="width:100%;" onclick="sendCustomStatus()">상태 업데이트</button>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="font-size: 0.9rem; font-weight: bold;">메시지만 전송</label>
+                <input type="text" id="direct-msg" placeholder="상태 변경 없이 메시지만 (Enter)" onkeypress="if(event.keyCode==13) sendDirectMsg()">
+                <button class="btn-primary" style="width:100%;" onclick="sendDirectMsg()">단순 메시지 보내기</button>
+            </div>
+
+            <div class="history-title" style="font-weight: bold; margin-bottom: 5px;">📜 활동 기록</div>
+            <div id="status-history"></div>
+
+            <div class="warning-box" style="border-left-color: #5865F2; color: #444; background-color: #f0f3ff;">
+                <strong>💡 팁</strong><br>
+                - 설정한 닉네임은 기기에 저장됩니다.<br>
+                - 복귀 버튼 클릭 시 타이머가 리셋됩니다.
+            </div>
+        </div>
+    </div>
+
+    <div class="grid-column">
+        <div class="card" style="border: 2px solid var(--accent-color);">
+            <h2>📡 실시간 상태</h2>
+            <div id="status-display">
+                <span class="status-icon" id="display-icon">❓</span>
+                <span id="display-text">상태를 선택하면<br>여기에 표시됩니다!</span>
+                <div id="countdown-display" style="display: none;"></div>
+            </div>
+
+            <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid #eee;">
+                <p style="font-size: 0.8rem; color: #999; line-height: 1.4; text-align: center;">
+                    디스코드 채널 알림과 연동되어<br>
+                    실시간으로 상태가 공유됩니다.
+                </p>
+            </div>
+        </div>
+    </div>
+
+</div>
 
 <script>
-function send(action) {
-    const nickname = document.getElementById('nickname').value.trim();
-    if (!nickname) {
-        alert("닉네임을 입력해야 버튼을 사용할 수 있어요!");
-        return;
-    }
+let countdownInterval;
+const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1458643194270056489/Ec0iQFL8m-sCdPC7AI29wqq0Cq_LDiLeI8Z5Rsp0Yrh7UEY8ysftSdEF-NeYdKkTQBBp";
 
-    // 메시지 설정
-    const messages = {
-        "eat": `${nickname}(이)가 밥을 먹으러 갔어요!`,
-        "toilet": `${nickname}(이)가 화장실에 갔어요!`,
-        "shop": `${nickname}(이)가 잠깐 물건을 사러 밖에 나갔어요!`,
-        "back": `${nickname}(이)가 돌아왔어요!`,
-        "coffee": `${nickname}(이)가 커피 마시러 갔어요!`,
-        "cigarette": `${nickname}(이)가 담배를 피러 갔어요!`,
-        "outing": `${nickname}(이)가 잠시 외출했어요!`,
-        "nap": `${nickname}(이)가 잠시 휴식하러 떠났어요!`
-    };
+window.onload = function() {
+    const savedName = localStorage.getItem('userNickname');
+    if (savedName) document.getElementById('nickname').value = savedName;
+    if (Notification.permission !== 'granted') Notification.requestPermission();
+    restoreStatus();
+}
 
-    const msg = messages[action];
-    if (!msg) return;
+function saveNickname() { localStorage.setItem('userNickname', document.getElementById('nickname').value); }
+function toggleTheme() { document.body.classList.toggle('dark-mode'); }
+function setTimeValue(min) { document.getElementById('return-time').value = min; }
 
-    // 현재 시간 가져오기 (24시간 형식)
+function getNowFormatted() {
     const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const timestamp = `${year}-${month}-${day} / ${hours}:${minutes}`;
+    return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+}
 
-    // Webhook 전송
-    fetch("https://discord.com/api/webhooks/1458597916955381800/FjIDySDIfP-kZp1udUCL7o6pQN0pv7yJyz0KLiYcLrEm6FyrK10Z5Z9XJnNN0JpRGpxf", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: `[${timestamp}] ${msg}` })
-    })
-    .then(() => {
-        console.log(`[${timestamp}] ${msg} 전송 완료`);
-    })
-    .catch(err => {
-        console.error("웹훅 전송 오류:", err);
-    });
+function sendDirectMsg() {
+    const nickname = document.getElementById('nickname').value.trim();
+    const content = document.getElementById('direct-msg').value.trim();
+    if (!nickname || !content) return alert("닉네임과 내용을 입력해주세요!");
+    const timestamp = getNowFormatted();
+    fetch(DISCORD_WEBHOOK, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ content: `[${timestamp}] ${nickname}: 💬 ${content}` }) });
+    addHistoryItem(nickname, `💬 ${content}`, timestamp);
+    document.getElementById('direct-msg').value = "";
+}
+
+function sendCustomStatus() {
+    const text = document.getElementById('custom-status').value.trim();
+    if (!text) return alert("상태 내용을 입력해주세요!");
+    send('etc', text);
+}
+
+function getUserColor(name) {
+    const colors = ['#FF5733', '#27ae60', '#2980b9', '#8e44ad', '#f39c12', '#16a085'];
+    return colors[name.length % colors.length];
+}
+
+function getActionMessage(action, customText = "") {
+    const messages = { eat: "밥 먹으러 갔어요!", toilet: "잠시 화장실에 갔어요!", coffee: "커피 한 잔 마시고 올게요!", shop: "잠깐 쇼핑하러 나갔어요!", outing: "잠시 외출 중이에요!", cigarette: "담배 한 대 피우고 올게요!", nap: "꿀잠 자러 갔어요!", back: "자리로 돌아왔어요!", etc: `${customText} 중이에요!` };
+    return messages[action] || "활동 중이에요!";
+}
+
+function send(action, statusName) {
+    const nickname = document.getElementById('nickname').value.trim();
+    const returnTimeValue = document.getElementById('return-time').value.trim();
+    const returnTime = returnTimeValue ? parseInt(returnTimeValue) : null;
+    if (!nickname) { alert("닉네임을 입력해주세요!"); return; }
+
+    clearInterval(countdownInterval);
+    document.getElementById('countdown-display').style.display = "none";
+
+    const icons = { eat: "🍚", toilet: "🚽", back: "✅", coffee: "☕", shop: "🛒", outing: "🏃", cigarette: "🚬", nap: "😴", etc: "✨" };
+    const icon = icons[action] || "📍";
+    const statusMsg = getActionMessage(action, statusName);
+    const timeInfo = (returnTime && action !== 'back') ? ` [${returnTime}분 뒤 복귀 예정]` : "";
+    const fullMsg = `${statusMsg}${timeInfo}`;
+    const timestamp = getNowFormatted();
+
+    fetch(DISCORD_WEBHOOK, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ content: `[${timestamp}] ${nickname}님이 ${icon} ${fullMsg}` }) });
+
+    updateUI(nickname, icon, statusName, timestamp, fullMsg);
+
+    if (action !== 'back') {
+        const expireTime = returnTime ? Date.now() + (returnTime * 60000) : null;
+        localStorage.setItem('currentStatus', JSON.stringify({ nickname, icon, statusName, expireTime }));
+        if (returnTime) {
+            document.getElementById('countdown-display').style.display = "block";
+            startTimer(returnTime * 60);
+        }
+    } else {
+        localStorage.removeItem('currentStatus');
+        document.getElementById('return-time').value = "";
+    }
+}
+
+function updateUI(nickname, icon, statusName, timestamp, msg) {
+    const userColor = getUserColor(nickname);
+    document.getElementById('display-icon').innerText = icon;
+    document.getElementById('display-text').innerHTML = `
+        <span style="color:${userColor}; font-size:1.1rem;">${nickname}</span><br>
+        <span style="color:#e74c3c;">[${statusName}]</span> 중<br>
+        <small style="font-size: 0.85rem; color: #777; font-weight:normal;">(${msg})</small>
+    `;
+    addHistoryItem(nickname, msg, timestamp);
+}
+
+function addHistoryItem(nickname, msg, timestamp) {
+    const historyBox = document.getElementById('status-history');
+    const newRecord = `<div class="history-item"><small style="color:gray;">${timestamp}</small> <strong>${nickname}</strong>: ${msg}</div>`;
+    historyBox.innerHTML = newRecord + historyBox.innerHTML;
+}
+
+function startTimer(secondsTotal) {
+    let secondsLeft = Math.floor(secondsTotal);
+    countdownInterval = setInterval(() => {
+        secondsLeft--;
+        if (secondsLeft <= 0) {
+            clearInterval(countdownInterval);
+            if (Notification.permission === 'granted') new Notification("복귀 알림", { body: "복귀 시간이 되었습니다!" });
+            send('back', '자동 복귀');
+            return;
+        }
+        const m = Math.floor(secondsLeft / 60);
+        const s = secondsLeft % 60;
+        document.getElementById('countdown-display').innerText = `⏳ 복귀까지 ${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')} 남음`;
+    }, 1000);
+}
+
+function restoreStatus() {
+    const data = localStorage.getItem('currentStatus');
+    if (!data) return;
+    const { nickname, icon, statusName, expireTime } = JSON.parse(data);
+    const now = Date.now();
+    if (expireTime && now > expireTime) { localStorage.removeItem('currentStatus'); return; }
+    updateUI(nickname, icon, statusName, getNowFormatted(), "상태 복구됨");
+    if (expireTime) {
+        document.getElementById('countdown-display').style.display = "block";
+        startTimer((expireTime - now) / 1000);
+    }
 }
 </script>
-
 </body>
 </html>
