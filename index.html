@@ -100,12 +100,22 @@
             </div>
 
             <div style="margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 10px; border: 1px dashed #ddd;">
-    <span style="font-size: 0.8rem; font-weight: bold; color: #666;">⏳ 타이머 연장하기</span><br>
-                <button onclick="extendTime(1)" style="background: #e1f5fe; color: #0288d1; font-size: 11px;">+1분</button>
-                <button onclick="extendTime(3)" style="background: #e1f5fe; color: #0288d1; font-size: 11px;">+3분</button>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+        <span style="font-size: 0.8rem; font-weight: bold; color: #666;">⏳ 타이머 연장하기</span>
+        <button onclick="document.getElementById('extend-direct-time').value=''" style="background: #ff7675; color: white; border: none; margin: 0; font-size: 10px; padding: 2px 6px;">초기화 🔄</button>
+    </div>
+
+    <button onclick="extendTime(1)" style="background: #e1f5fe; color: #0288d1; font-size: 11px;">+1분</button>
+    <button onclick="extendTime(3)" style="background: #e1f5fe; color: #0288d1; font-size: 11px;">+3분</button>
     <button onclick="extendTime(5)" style="background: #e1f5fe; color: #0288d1; font-size: 11px;">+5분</button>
     <button onclick="extendTime(10)" style="background: #e1f5fe; color: #0288d1; font-size: 11px;">+10분</button>
     <button onclick="extendTime(30)" style="background: #e1f5fe; color: #0288d1; font-size: 11px;">+30분</button>
+                <button onclick="extendTime(60)" style="background: #e1f5fe; color: #0288d1; font-size: 11px;">+60분</button>
+
+    <div style="display: flex; align-items: center; margin-top: 8px;">
+        <input type="number" id="extend-direct-time" class="timer-input" style="width: 70px; height: 30px; margin: 0 5px 0 0;" placeholder="분">
+        <button class="btn-success" style="padding: 5px 10px; font-size: 11px; margin: 0;" onclick="extendDirect()">연장하기</button>
+    </div>
 </div>
 
             <hr style="margin: 25px 0; border: 0; border-top: 1px solid #eee;">
@@ -392,6 +402,17 @@ function restoreStatus() {
 
     // 4. 기록 추가
     addHistoryItem(statusData.nickname, `⏳ 시간을 ${min}분 연장함 (예정: ${targetHour}:${targetMin})`, timestamp);
+}
+
+    // 직접 입력한 값으로 시간을 연장하는 함수
+function extendDirect() {
+    const min = document.getElementById('extend-direct-time').value;
+    if (!min || min <= 0) {
+        alert("연장할 시간을 숫자로 입력해주세요!");
+        return;
+    }
+    extendTime(parseInt(min)); // 기존에 만든 extendTime 함수를 재사용합니다!
+    document.getElementById('extend-direct-time').value = ""; // 입력창 비우기
 }
 </script>
 </body>
