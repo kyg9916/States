@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>상태알라미 v6.3</title>
+<title>상태알라미 v6.5 (Embed)</title>
 <style>
     :root {
         --bg-color: #f0f2f5;
@@ -28,75 +28,20 @@
         transition: 0.3s;
     }
 
-    /* 메인 타이틀 영역 */
-    .header-area {
-        text-align: center;
-        margin-top: 40px;
-        margin-bottom: -10px;
-    }
-    .header-area h1 {
-        font-size: 2.2rem;
-        color: var(--accent-color);
-        margin-bottom: 5px;
-        letter-spacing: -1px;
-    }
-    .header-area .developer {
-        font-size: 0.9rem;
-        color: #888;
-        font-weight: 500;
-    }
+    .header-area { text-align: center; margin-top: 40px; margin-bottom: -10px; }
+    .header-area h1 { font-size: 2.2rem; color: var(--accent-color); margin-bottom: 5px; letter-spacing: -1px; }
+    .header-area .developer { font-size: 0.9rem; color: #888; font-weight: 500; }
 
     h2 { margin-top: 0; font-size: 1.4rem; color: var(--accent-color); margin-bottom: 20px; }
 
-    .main-grid {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 20px;
-        max-width: 1400px;
-        margin: 40px auto;
-        justify-content: center;
-        align-items: stretch;
-    }
+    .main-grid { display: flex; flex-wrap: wrap; gap: 20px; max-width: 1400px; margin: 40px auto; justify-content: center; }
+    .grid-column { flex: 1 1 350px; display: flex; flex-direction: column; }
+    .card { background: var(--card-bg); border-radius: var(--border-radius); padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); height: 100%; box-sizing: border-box; display: flex; flex-direction: column; }
 
-    .grid-column {
-        flex: 1 1 350px;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .card {
-        background: var(--card-bg);
-        border-radius: var(--border-radius);
-        padding: 25px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        height: 100%;
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: column;
-    }
-
-    input {
-        width: 100%;
-        padding: 12px;
-        margin: 10px 0;
-        border-radius: 10px;
-        border: 1px solid #ddd;
-        box-sizing: border-box;
-        outline: none;
-        font-size: 14px;
-    }
+    input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #ddd; box-sizing: border-box; outline: none; font-size: 14px; }
     .timer-input { width: 100px; display: inline-block; background-color: #fffbe6; margin-right: 5px; }
 
-    button {
-        padding: 10px 12px;
-        margin: 3px;
-        font-size: 13px;
-        cursor: pointer;
-        border-radius: 8px;
-        border: none;
-        background-color: #f1f3f5;
-        transition: 0.2s;
-    }
+    button { padding: 10px 12px; margin: 3px; font-size: 13px; cursor: pointer; border-radius: 8px; border: none; background-color: #f1f3f5; transition: 0.2s; }
     button:hover { background-color: #e9ecef; transform: translateY(-2px); }
     .btn-primary { background-color: var(--accent-color); color: white; }
     .btn-success { background-color: var(--custom-color); color: white; }
@@ -105,49 +50,19 @@
     .time-chip { background-color: #ffeaa7; border: 1px solid #fdcb6e; font-weight: 600; }
     .time-chip:hover { background-color: #fab1a0; }
 
-    #status-display {
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: flex-start;
-        padding-top: 20px;
-    }
+    #status-display { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 20px; }
     .status-icon { font-size: 5.5rem; margin-bottom: 25px; }
     #display-text { font-size: 1.5rem; font-weight: bold; line-height: 1.6; text-align: center; }
     #countdown-display { font-size: 1.5rem; color: #e74c3c; margin-top: 25px; font-weight: 800; background: #fff5f5; padding: 10px 20px; border-radius: 30px; }
 
-    #status-history {
-        max-height: 250px;
-        overflow-y: auto;
-        text-align: left;
-        background: #f9f9f9;
-        padding: 10px;
-        border-radius: 8px;
-        margin-top: 10px;
-        flex-grow: 1;
-    }
+    #status-history { max-height: 250px; overflow-y: auto; text-align: left; background: #f9f9f9; padding: 10px; border-radius: 8px; margin-top: 10px; flex-grow: 1; }
     .dark-mode #status-history { background: #35373c; }
     .history-item { padding: 8px; border-bottom: 1px solid #eee; font-size: 0.85rem; }
 
-    .warning-box {
-        background-color: #fff5f5;
-        border-left: 4px solid #ff8787;
-        padding: 12px;
-        margin-top: 15px;
-        font-size: 0.8rem;
-        text-align: left;
-        color: #e03131;
-    }
+    .warning-box { background-color: #fff5f5; border-left: 4px solid #ff8787; padding: 12px; margin-top: 15px; font-size: 0.8rem; text-align: left; color: #e03131; }
     .dark-mode .warning-box { background-color: #3b2525; color: #ffc9c9; }
 
     .theme-btn { position: fixed; top: 20px; right: 20px; background-color: var(--accent-color); color: white; width: 45px; height: 45px; border-radius: 50%; z-index: 1000; }
-
-    @media (max-width: 1100px) {
-        .main-grid { flex-direction: column; }
-        .grid-column { min-height: auto; }
-        .header-area { margin-top: 60px; }
-    }
 </style>
 </head>
 <body>
@@ -155,19 +70,21 @@
 <button class="theme-btn" onclick="toggleTheme()">🌓</button>
 
 <div class="header-area">
-    <h1>📡 디스코드 상태알라미 v6.3</h1>
+    <h1>📡 디스코드 상태알라미 v6.5</h1>
     <div class="developer">Developer by. 김윤겸</div>
 </div>
 
 <div class="main-grid">
-
     <div class="grid-column">
         <div class="card">
             <h2>👤 내 설정</h2>
             <input type="text" id="nickname" placeholder="닉네임을 입력하세요" oninput="saveNickname()">
 
             <div style="margin-top: 20px;">
-                <strong>⏱ 복귀 시간 선택 (분)</strong><br>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <strong>⏱ 복귀 시간 선택 (분)</strong>
+                    <button class="time-chip" style="background-color: #ff7675; color: white; border: none; margin: 0; font-size: 11px; padding: 5px 10px;" onclick="resetTimeValue()">초기화 🔄</button>
+                </div>
                 <div style="margin: 10px 0;">
                     <button class="time-chip" onclick="setTimeValue(3)">3분</button>
                     <button class="time-chip" onclick="setTimeValue(5)">5분</button>
@@ -176,19 +93,20 @@
                     <button class="time-chip" onclick="setTimeValue(30)">30분</button>
                     <button class="time-chip" onclick="setTimeValue(60)">60분</button>
                 </div>
-
                 <div style="display: flex; align-items: center; margin-top: 10px;">
                     <input type="number" id="return-time" class="timer-input" placeholder="직접 입력">
                     <span>분 후 복귀</span>
                 </div>
-
-                <div class="warning-box">
-                    <strong>⚠️ 이용 가이드</strong><br>
-                    - 시간을 정하고 아래 상태 버튼을 누르세요.<br>
-                    - 미설정 시 무제한 상태로 유지됩니다.<br>
-                    - 브라우저 알림 권한 허용을 권장합니다.
-                </div>
             </div>
+
+            <div style="margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 10px; border: 1px dashed #ddd;">
+    <span style="font-size: 0.8rem; font-weight: bold; color: #666;">⏳ 타이머 연장하기</span><br>
+                <button onclick="extendTime(1)" style="background: #e1f5fe; color: #0288d1; font-size: 11px;">+1분</button>
+                <button onclick="extendTime(3)" style="background: #e1f5fe; color: #0288d1; font-size: 11px;">+3분</button>
+    <button onclick="extendTime(5)" style="background: #e1f5fe; color: #0288d1; font-size: 11px;">+5분</button>
+    <button onclick="extendTime(10)" style="background: #e1f5fe; color: #0288d1; font-size: 11px;">+10분</button>
+    <button onclick="extendTime(30)" style="background: #e1f5fe; color: #0288d1; font-size: 11px;">+30분</button>
+</div>
 
             <hr style="margin: 25px 0; border: 0; border-top: 1px solid #eee;">
 
@@ -211,24 +129,16 @@
             <h2>✨ 커스텀 & 기록</h2>
             <div style="margin-bottom: 20px;">
                 <label style="font-size: 0.9rem; font-weight: bold;">나만의 상태 입력</label>
-                <input type="text" id="custom-status" placeholder="회의, 산책 등 직접 작성 (Enter)" onkeypress="if(event.keyCode==13) sendCustomStatus()">
+                <input type="text" id="custom-status" placeholder="회의, 산책 등 직접 작성" onkeypress="if(event.keyCode==13) sendCustomStatus()">
                 <button class="btn-success" style="width:100%;" onclick="sendCustomStatus()">상태 업데이트</button>
             </div>
-
             <div style="margin-bottom: 20px;">
                 <label style="font-size: 0.9rem; font-weight: bold;">메시지만 전송</label>
-                <input type="text" id="direct-msg" placeholder="상태 변경 없이 메시지만 (Enter)" onkeypress="if(event.keyCode==13) sendDirectMsg()">
-                <button class="btn-primary" style="width:100%;" onclick="sendDirectMsg()">단순 메시지 보내기</button>
+                <input type="text" id="direct-msg" placeholder="단순 메시지 입력" onkeypress="if(event.keyCode==13) sendDirectMsg()">
+                <button class="btn-primary" style="width:100%;" onclick="sendDirectMsg()">메시지 보내기</button>
             </div>
-
             <div class="history-title" style="font-weight: bold; margin-bottom: 5px;">📜 활동 기록</div>
             <div id="status-history"></div>
-
-            <div class="warning-box" style="border-left-color: #5865F2; color: #444; background-color: #f0f3ff;">
-                <strong>💡 팁</strong><br>
-                - 설정한 닉네임은 기기에 저장됩니다.<br>
-                - 복귀 버튼 클릭 시 타이머가 리셋됩니다.
-            </div>
         </div>
     </div>
 
@@ -240,22 +150,15 @@
                 <span id="display-text">상태를 선택하면<br>여기에 표시됩니다!</span>
                 <div id="countdown-display" style="display: none;"></div>
             </div>
-
-            <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid #eee;">
-                <p style="font-size: 0.8rem; color: #999; line-height: 1.4; text-align: center;">
-                    디스코드 채널 알림과 연동되어<br>
-                    실시간으로 상태가 공유됩니다.
-                </p>
-            </div>
         </div>
     </div>
-
 </div>
 
 <script>
 let countdownInterval;
 const DISCORD_WEBHOOK = "https://discord.com/api/webhooks/1458597916955381800/FjIDySDIfP-kZp1udUCL7o6pQN0pv7yJyz0KLiYcLrEm6FyrK10Z5Z9XJnNN0JpRGpxf";
-
+// 테스트용 https://discord.com/api/webhooks/1458643194270056489/Ec0iQFL8m-sCdPC7AI29wqq0Cq_LDiLeI8Z5Rsp0Yrh7UEY8ysftSdEF-NeYdKkTQBBp
+// 실제 https://discord.com/api/webhooks/1458597916955381800/FjIDySDIfP-kZp1udUCL7o6pQN0pv7yJyz0KLiYcLrEm6FyrK10Z5Z9XJnNN0JpRGpxf
 window.onload = function() {
     const savedName = localStorage.getItem('userNickname');
     if (savedName) document.getElementById('nickname').value = savedName;
@@ -265,6 +168,7 @@ window.onload = function() {
 
 function saveNickname() { localStorage.setItem('userNickname', document.getElementById('nickname').value); }
 function toggleTheme() { document.body.classList.toggle('dark-mode'); }
+function resetTimeValue() { document.getElementById('return-time').value = ""; }
 function setTimeValue(min) { document.getElementById('return-time').value = min; }
 
 function getNowFormatted() {
@@ -272,12 +176,23 @@ function getNowFormatted() {
     return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 }
 
+// 💬 단순 메시지 전송 (Embed 적용)
 function sendDirectMsg() {
     const nickname = document.getElementById('nickname').value.trim();
     const content = document.getElementById('direct-msg').value.trim();
     if (!nickname || !content) return alert("닉네임과 내용을 입력해주세요!");
+
     const timestamp = getNowFormatted();
-    fetch(DISCORD_WEBHOOK, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ content: `[${timestamp}] ${nickname}: 💬 ${content}` }) });
+    const embedData = {
+        embeds: [{
+            author: { name: nickname },
+            description: `💬 ${content}`,
+            color: 5814783,
+            footer: { text: `발송 시각: ${timestamp}` }
+        }]
+    };
+
+    fetch(DISCORD_WEBHOOK, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(embedData) });
     addHistoryItem(nickname, `💬 ${content}`, timestamp);
     document.getElementById('direct-msg').value = "";
 }
@@ -288,16 +203,12 @@ function sendCustomStatus() {
     send('etc', text);
 }
 
-function getUserColor(name) {
-    const colors = ['#FF5733', '#27ae60', '#2980b9', '#8e44ad', '#f39c12', '#16a085'];
-    return colors[name.length % colors.length];
-}
-
 function getActionMessage(action, customText = "") {
     const messages = { eat: "밥 먹으러 갔어요!", toilet: "잠시 화장실에 갔어요!", coffee: "커피 한 잔 마시고 올게요!", shop: "잠깐 쇼핑하러 나갔어요!", outing: "잠시 외출 중이에요!", cigarette: "담배 한 대 피우고 올게요!", nap: "꿀잠 자러 갔어요!", back: "자리로 돌아왔어요!", etc: `${customText} 중이에요!` };
     return messages[action] || "활동 중이에요!";
 }
 
+// 🚀 상태 전송 메인 함수 (Embed 적용)
 function send(action, statusName) {
     const nickname = document.getElementById('nickname').value.trim();
     const returnTimeValue = document.getElementById('return-time').value.trim();
@@ -307,20 +218,54 @@ function send(action, statusName) {
     clearInterval(countdownInterval);
     document.getElementById('countdown-display').style.display = "none";
 
-    const icons = { eat: "🍚", toilet: "🚽", back: "✅", coffee: "☕", shop: "🛒", outing: "🏃", cigarette: "🚬", nap: "😴", etc: "✨" };
-    const icon = icons[action] || "📍";
+    const design = {
+        eat: { icon: "🍚", color: 16753920 },
+        toilet: { icon: "🚽", color: 3447003 },
+        coffee: { icon: "☕", color: 10181046 },
+        shop: { icon: "🛒", color: 15844367 },
+        outing: { icon: "🏃", color: 15105570 },
+        cigarette: { icon: "🚬", color: 9807270 },
+        nap: { icon: "😴", color: 15548997 },
+        back: { icon: "✅", color: 3066993 },
+        etc: { icon: "✨", color: 5814783 }
+    };
+
+    const info = design[action] || design.etc;
     const statusMsg = getActionMessage(action, statusName);
-    const timeInfo = (returnTime && action !== 'back') ? ` [${returnTime}분 뒤 복귀 예정]` : "";
-    const fullMsg = `${statusMsg}${timeInfo}`;
     const timestamp = getNowFormatted();
 
-    fetch(DISCORD_WEBHOOK, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ content: `[${timestamp}] ${nickname}님이 ${icon} ${fullMsg}` }) });
+    // --- 💡 예상 복귀 시각 계산 로직 추가 ---
+    let estimatedReturnMsg = "즉시/없음";
+    if (action !== 'back' && returnTime) {
+        const now = new Date();
+        now.setMinutes(now.getMinutes() + returnTime); // 현재 시간에 '입력한 분'을 더함
+        const hour = String(now.getHours()).padStart(2, '0');
+        const min = String(now.getMinutes()).padStart(2, '0');
+        estimatedReturnMsg = `${returnTime}분 후 (${hour}:${min} 예정)`;
+    }
+    // ---------------------------------------
 
-    updateUI(nickname, icon, statusName, timestamp, fullMsg);
+    const embedData = {
+        embeds: [{
+            title: `${info.icon} ${nickname}님의 상태`,
+            color: info.color,
+            description: `${statusMsg}`,
+            fields: [
+                { name: "현재 상태", value: statusName, inline: true },
+                { name: "복귀 예정 시각", value: estimatedReturnMsg, inline: true } // 👈 메시지 변경
+            ],
+            footer: { text: `발생 시각: ${timestamp}` }
+        }]
+    };
 
+    fetch(DISCORD_WEBHOOK, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(embedData) });
+
+    updateUI(nickname, info.icon, statusName, timestamp, statusMsg);
+
+    // 저장 및 타이머 로직 (기존과 동일)
     if (action !== 'back') {
         const expireTime = returnTime ? Date.now() + (returnTime * 60000) : null;
-        localStorage.setItem('currentStatus', JSON.stringify({ nickname, icon, statusName, expireTime }));
+        localStorage.setItem('currentStatus', JSON.stringify({ nickname, icon: info.icon, statusName, expireTime }));
         if (returnTime) {
             document.getElementById('countdown-display').style.display = "block";
             startTimer(returnTime * 60);
@@ -332,12 +277,11 @@ function send(action, statusName) {
 }
 
 function updateUI(nickname, icon, statusName, timestamp, msg) {
-    const userColor = getUserColor(nickname);
     document.getElementById('display-icon').innerText = icon;
     document.getElementById('display-text').innerHTML = `
-        <span style="color:${userColor}; font-size:1.1rem;">${nickname}</span><br>
+        <span style="color:#5865F2; font-size:1.1rem;">${nickname}</span><br>
         <span style="color:#e74c3c;">[${statusName}]</span> 중<br>
-        <small style="font-size: 0.85rem; color: #777; font-weight:normal;">(${msg})</small>
+        <small style="font-size: 0.85rem; color: #777;">(${msg})</small>
     `;
     addHistoryItem(nickname, msg, timestamp);
 }
@@ -375,6 +319,53 @@ function restoreStatus() {
         document.getElementById('countdown-display').style.display = "block";
         startTimer((expireTime - now) / 1000);
     }
+}
+
+    function extendTime(min) {
+    const data = localStorage.getItem('currentStatus');
+    if (!data) {
+        alert("현재 실행 중인 타이머가 없습니다. 상태를 먼저 선택해주세요!");
+        return;
+    }
+
+    const statusData = JSON.parse(data);
+    const now = Date.now();
+
+    // 만약 이미 시간이 만료되었다면 현재 시간부터 다시 계산, 아니면 기존 만료시간에 추가
+    let baseTime = (statusData.expireTime && statusData.expireTime > now)
+                   ? statusData.expireTime
+                   : now;
+
+    const newExpireTime = baseTime + (min * 60000);
+    const remainingSeconds = Math.floor((newExpireTime - now) / 1000);
+
+    // 1. 데이터 업데이트
+    statusData.expireTime = newExpireTime;
+    localStorage.setItem('currentStatus', JSON.stringify(statusData));
+
+    // 2. 타이머 재시작
+    clearInterval(countdownInterval);
+    document.getElementById('countdown-display').style.display = "block";
+    startTimer(remainingSeconds);
+
+    // 3. 디스코드에 연장 알림 전송 (Embed)
+    const timestamp = getNowFormatted();
+    const embedData = {
+        embeds: [{
+            title: `⏳ 시간 연장 알림`,
+            color: 3447003, // 파란색
+            description: `${statusData.nickname}님의 복귀 시간이 ${min}분 연장**되었습니다.`,
+            fields: [
+                { name: "남은 시간", value: `${Math.floor(remainingSeconds / 60)}분`, inline: true }
+            ],
+            footer: { text: `연장 시각: ${timestamp}` }
+        }]
+    };
+
+    fetch(DISCORD_WEBHOOK, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(embedData) });
+
+    // 4. 기록 추가
+    addHistoryItem(statusData.nickname, `⏳ 시간을 ${min}분 연장함`, timestamp);
 }
 </script>
 </body>
