@@ -63,6 +63,40 @@
     .dark-mode .warning-box { background-color: #3b2525; color: #ffc9c9; }
 
     .theme-btn { position: fixed; top: 20px; right: 20px; background-color: var(--accent-color); color: white; width: 45px; height: 45px; border-radius: 50%; z-index: 1000; }
+
+    /* 푸터 스타일 */
+.footer-info {
+    max-width: 1400px;
+    margin: 40px auto 20px;
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.03); /* 아주 연한 회색 */
+    border-radius: var(--border-radius);
+    font-size: 0.85rem;
+    color: #666;
+    line-height: 1.6;
+}
+
+.dark-mode .footer-info {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: #aaa;
+}
+
+.footer-info strong {
+    color: var(--accent-color);
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+.footer-info ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.footer-info ul li {
+    margin-bottom: 5px;
+}
+
 </style>
 </head>
 <body>
@@ -153,15 +187,64 @@
     </div>
 
     <div class="grid-column">
-        <div class="card" style="border: 2px solid var(--accent-color);">
-            <h2>📡 실시간 상태</h2>
-            <div id="status-display">
-                <span class="status-icon" id="display-icon">❓</span>
-                <span id="display-text">상태를 선택하면<br>여기에 표시됩니다!</span>
-                <div id="countdown-display" style="display: none;"></div>
-            </div>
+    <div class="card" style="border: 2px solid var(--accent-color); margin-bottom: 20px;">
+        <h2>📡 실시간 상태</h2>
+        <div id="status-display">
+            <span class="status-icon" id="display-icon">❓</span>
+            <span id="display-text">상태를 선택하면<br>여기에 표시됩니다!</span>
+            <div id="countdown-display" style="display: none;"></div>
         </div>
     </div>
+
+    <div class="card" style="border: 2px solid #ff7675;">
+        <h2>🐱 캬루에게 질문하기 (개발중) </h2>
+        <div style="font-size: 0.8rem; color: #888; margin-bottom: 10px;">
+            츤데레 캬루쨩에게 말을 걸어보세요!
+        </div>
+        <input type="text" id="kyaru-input" placeholder="야! 뭐 물어볼 거라도 있어? (Enter)" onkeypress="if(event.keyCode==13) askKyaru()">
+        <button class="btn-primary" style="width: 100%; background-color: #ff7675;" onclick="askKyaru()">질문 던지기</button>
+
+        <div id="kyaru-response" style="margin-top: 15px; padding: 12px; background: #fff5f5; border-radius: 12px; font-size: 0.9rem; min-height: 50px; display: none; border: 1px dashed #ff7675;">
+            <strong>🐱 캬루:</strong> <span id="kyaru-text"></span>
+        </div>
+    </div>
+</div>
+</div>
+
+<div class="footer-info">
+    <strong>📘 앱 사용 방법</strong>
+<ul>
+    <li>닉네임을 먼저 입력한 후, 현재 상태를 선택하세요.</li>
+    <li>복귀 시간이 필요한 경우, 상태 선택 전에 분 단위로 시간을 설정하면 자동 타이머가 시작됩니다.</li>
+    <li>빠른 상태 버튼을 누르면 디스코드에 현재 상태와 복귀 예정 시각이 전송됩니다.</li>
+    <li>상태 진행 중에는 타이머 연장 버튼을 통해 복귀 시간을 추가로 늘릴 수 있습니다.</li>
+    <li>복귀 버튼을 누르면 즉시 상태가 종료되며, 자동 복귀 타이머도 함께 해제됩니다.</li>
+</ul>
+
+    <hr style="border: 0; border-top: 1px solid rgba(0,0,0,0.1); margin: 15px 0;">
+
+    <strong>⏱ 타이머 기능 사용 시 주의사항</strong>
+<ul>
+    <li>타이머는 브라우저에 저장되며, 같은 브라우저에서만 상태 복구가 가능합니다.</li>
+    <li>브라우저를 완전히 종료하거나 저장 데이터가 삭제되면 타이머 정보가 사라질 수 있습니다.</li>
+    <li>복귀 시간이 지난 상태에서 연장할 경우, 연장은 현재 시점을 기준으로 다시 계산됩니다.</li>
+    <li>자동 복귀 시에도 디스코드로 복귀 상태가 전송되며, 알림 권한이 허용된 경우 알림이 표시됩니다.</li>
+    <li>네트워크 상태에 따라 디스코드 메시지 전송이 지연되거나 실패할 수 있습니다.</li>
+</ul>
+
+    <hr style="border: 0; border-top: 1px solid rgba(0,0,0,0.1); margin: 15px 0;">
+
+    <strong>⏱ 알람 사용과 쿠키에 대해</strong>
+
+    <ul>
+        <li>창 유지 필수: 타이머는 브라우저 엔진에서 돌아가요. 창을 완전히 닫거나 컴퓨터가 절전 모드에 들어가면 자동 복귀 기능이 멈출 수 있으니 주의해 주세요!</li>
+        <li>새로고침 안심: 다행히 새로고침을 하거나 실수로 창을 잠시 닫아도, 기존에 설정한 타이머는 로컬 저장소 덕분에 자동으로 복구됩니다.</li>
+        <li>알림 허용: 타이머가 끝났을 때 알림을 받고 싶다면, 브라우저 주소창 왼쪽의 자물쇠 아이콘을 눌러 '알림 권한'을 꼭 허용해 주세요.</li>
+    </ul>
+
+    <hr style="border: 0; border-top: 1px solid rgba(0,0,0,0.1); margin: 15px 0;">
+
+    <p style="text-align: center; margin-top: 20px; opacity: 0.6; font-size: 0.75rem;">© 2026 김윤겸. All rights reserved.</p>
 </div>
 
 <script>
@@ -414,6 +497,37 @@ function extendDirect() {
     extendTime(parseInt(min)); // 기존에 만든 extendTime 함수를 재사용합니다!
     document.getElementById('extend-direct-time').value = ""; // 입력창 비우기
 }
+
+    async function askKyaru() {
+    const inputField = document.getElementById('kyaru-input');
+    const question = inputField.value.trim();
+    const responseBox = document.getElementById('kyaru-response');
+    const responseText = document.getElementById('kyaru-text');
+
+    if (!question) return alert("바보야! 물어볼 말을 써야지!");
+
+    // UI 업데이트
+    responseText.innerText = "생각 중이니까 좀 기다려 봐...!";
+    responseBox.style.display = "block";
+    inputField.value = "";
+
+    try {
+        // 파이썬 Flask 서버의 /action 또는 새로운 /ask 엔드포인트로 요청
+        // 현재 Flask 코드에 질문 답변용 API를 추가해야 통신이 가능합니다.
+        const response = await fetch('/ask_kyaru', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: question, nickname: document.getElementById('nickname').value })
+        });
+
+        const data = await response.json();
+        responseText.innerText = data.answer;
+    } catch (error) {
+        responseText.innerText = "흥! 서버랑 연결이 안 되잖아. 네가 뭘 잘못한 거 아냐?";
+        console.error("Error:", error);
+    }
+}
+
 </script>
 </body>
 </html>
